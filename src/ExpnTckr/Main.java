@@ -17,7 +17,7 @@ public class Main {
             case "update" -> ExpenseService.updateExpense();
             case "show" -> ExpenseService.showExpense();
             case "summary" -> ExpenseService.showSummary();
-            default -> System.out.println("invalid action");
+            default -> System.out.println("invalid action.");
         }
     }
 }
