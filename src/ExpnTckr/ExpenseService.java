@@ -29,8 +29,52 @@ public class ExpenseService {
     }
 
     public static void deleteExpense(String[] args) throws IOException {
+        int targetId = -1;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--id") && i + 1 < args.length) {
+                targetId = Integer.parseInt(args[i + 1]);
+            }
+        }
+        if (targetId == -1) {
+            System.out.println("Please provide a valid id");
+            return;
+        }
+        BufferedReader reader = new BufferedReader(new FileReader("csv.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"));
+        String line;
+        boolean found = false;
 
+        while ((line = reader.readLine()) != null) {
+            if (line.trim().isEmpty()) continue;
+            String[] parts = line.split(",");
+            if (parts.length < 4) continue;
+            int currentId = Integer.parseInt(parts[0]);
+            if (currentId == targetId) {
+                found = true;
+                continue;
+            }
+            writer.write(line);
+            writer.newLine();
+        }
 
+        reader.close();
+        writer.close();
+
+        File original = new File("csv.txt");
+        File temp = new File("temp.txt");
+        if (!original.delete()) {
+            System.out.println("Failed to delete original file");
+            return;
+        }
+        if (!temp.renameTo(original)) {
+            System.out.println("Failed to rename temp file");
+            return;
+        }
+        if (found) {
+            System.out.println("Expense deleted successfully");
+        } else {
+            System.out.println("Expense not found");
+        }
     }
 
     public static void updateExpense() {
