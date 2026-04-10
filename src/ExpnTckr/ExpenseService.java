@@ -77,8 +77,63 @@ public class ExpenseService {
         }
     }
 
-    public static void updateExpense() {
+    public static void updateExpense(String[] args) throws IOException {
+        int targetId = -1;
+        String newDescription = null;
+        double newAmount = -1;
 
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--id") && i + 1 < args.length) {
+                targetId = Integer.parseInt(args[i + 1]);
+            }
+            if (args[i].equals("--description") && i + 1 < args.length) {
+                newDescription = args[i + 1];
+            }
+            if (args[i].equals("--amount") && i + 1 < args.length) {
+                newAmount = Double.parseDouble(args[i + 1]);
+            }
+        }
+        BufferedReader reader = new BufferedReader(new FileReader("csv.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"));
+        String line;
+        boolean found = false;
+
+        while ((line = reader.readLine()) != null) {
+            if (line.trim().isEmpty()) continue;
+            String[] parts = line.split(",");
+            if (parts.length < 4) continue;
+            int id = Integer.parseInt(parts[0]);
+            if (id == targetId) {
+                found = true;
+                String description = (newDescription != null) ? newDescription : parts[1];
+                double amount = (newAmount != -1) ? newAmount : Double.parseDouble(parts[2]);
+                String date = parts[3];
+                writer.write(id + "," + description + "," + amount + "," + date);
+                writer.newLine();
+            } else {
+                writer.write(line);
+                writer.newLine();
+            }
+        }
+
+        reader.close();
+        writer.close();
+
+        File original = new File("csv.txt");
+        File temp = new File("temp.txt");
+        if (!original.delete()) {
+            System.out.println("Failed to delete original file");
+            return;
+        }
+        if (!temp.renameTo(original)) {
+            System.out.println("Failed to rename temp file");
+            return;
+        }
+        if (found) {
+            System.out.println("Expense updated successfully");
+        } else {
+            System.out.println("Expense not found");
+        }
     }
 
     public static void showExpense() throws IOException {
@@ -112,7 +167,6 @@ public class ExpenseService {
             String[] fields = line.split(",");
             if (fields.length < 4) {
                 System.out.println("Skipping invalid line: " + line);
-                continue;
             } else {
                 double amount = Double.parseDouble(fields[2]);
                 sum += amount;

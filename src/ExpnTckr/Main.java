@@ -14,7 +14,7 @@ public class Main {
         switch(action) {
             case "add" -> ExpenseService.addExpense(args);
             case "delete" -> ExpenseService.deleteExpense(args);
-            case "update" -> ExpenseService.updateExpense();
+            case "update" -> ExpenseService.updateExpense(args);
             case "show" -> ExpenseService.showExpense();
             case "summary" -> ExpenseService.showSummary();
             default -> System.out.println("invalid action.");
